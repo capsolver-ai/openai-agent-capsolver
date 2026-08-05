@@ -1,20 +1,9 @@
 {
   "name": "openai-agent-capsolver",
   "owner": "capsolver-ai",
-  "description": "Official CapSolver function tools for the OpenAI Agents SDK, with structured results and tracing-friendly execution.",
-  "homepage": "https://docs.capsolver.com/en/guide/ai/capsolver-for-ai-agents/",
-  "topics": [
-    "capsolver",
-    "openai",
-    "openai-agents",
-    "agents-sdk",
-    "ai-agents",
-    "captcha",
-    "function-calling",
-    "python",
-    "llm",
-    "agent-tools"
-  ],
-  "visibility": "public",
-  "status": "publish-now"
+  "description": "Runnable OpenAI Agents SDK examples using the CapSolver Agent library.",
+  "homepage": "https://docs.capsolver.com/en/guide/ai/agent-tools/",
+  "topics": ["capsolver", "openai-agents", "openai", "ai-agents", "agent-tools", "captcha", "examples", "python", "llm", "function-calling"],
+  "visibility": "private",
+  "status": "demo"
 }

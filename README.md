@@ -1,131 +1,68 @@
-<div align="center">
+# OpenAI Agents SDK + CapSolver Agent examples
 
-# openai-agent-capsolver
-
-**Official CapSolver function tools for the OpenAI Agents SDK, with structured results and tracing-friendly execution.**
-
-[![Status](https://img.shields.io/badge/status-release--candidate-blue)](#project-status)
+[![Demo repository](https://img.shields.io/badge/type-runnable%20demo-0A7BBB)](#repository-scope)
 [![CI](https://github.com/capsolver-ai/openai-agent-capsolver/actions/workflows/ci.yml/badge.svg)](https://github.com/capsolver-ai/openai-agent-capsolver/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-ISC-green.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-CapSolver-7c3aed)](https://docs.capsolver.com/en/guide/ai/capsolver-for-ai-agents/)
-[![Responsible use](https://img.shields.io/badge/use-authorized%20automation-0a7)](#responsible-use)
+[![License: ISC](https://img.shields.io/badge/license-ISC-green.svg)](LICENSE)
 
-[Quick start](#quick-start) · [Architecture](#architecture) · [Examples](#examples) · [Documentation](#documentation) · [Contributing](#contributing)
+Runnable OpenAI Agents SDK examples using the official [`capsolver-agent`](https://github.com/capsolver-ai/capsolver-agent) executor.
 
-</div>
+> Examples only: this repository does not publish an additional Python library.
 
-## Why this integration exists
+## Repository scope
 
-Agents can navigate, click, and type, but verification challenges can interrupt a successful workflow. This repository adds CapSolver as a recovery layer for OpenAI Agents SDK. Your application keeps its browser session, orchestration, model, and business logic while CapSolver handles supported challenges and returns control to the original task.
-
-Initial adapter code, tests, CI, and release automation are included.
-
-## Highlights
-
-- Native OpenAI Agents SDK integration rather than a generic copy-and-paste snippet.
-- Shared maintained engine through capsolver-agent; solving logic is not duplicated.
-- Async-friendly execution for browser and agent workloads.
-- Structured results for tracing, bounded retries, and debugging.
-- Token mode and browser recovery where supported.
-- Designed for lawful, user-authorized, terms-compliant automation.
-
-## Project status
-
-| Item | Value |
-|---|---|
-| Lifecycle | publish-now |
-| Ecosystem | OpenAI Agents SDK |
-| Language | Python |
-| Shared runtime | capsolver-agent |
-| Maintainer | [capsolver-ai](https://github.com/capsolver-ai) |
-| Coverage | reCAPTCHA v2/v3 and Cloudflare Turnstile, subject to shared runtime |
-
-## Installation
-
-~~~bash
-pip install openai-agent-capsolver
-export CAPSOLVER_API_KEY="CAP-..."
-~~~
-
-Never commit an API key. Browser-backed Python projects may also need: playwright install chromium.
+The demo uses OpenAI Agents SDK function tools as a thin framework boundary. Tool execution, schemas, supported CAPTCHA types, retries, and errors remain centralized in CapSolver Agent and Core.
 
 ## Quick start
 
-~~~python
-# Representative API. Scaffolds finalize this during their release gate.
-integration = get_capsolver_tools()
-~~~
+```bash
+git clone https://github.com/capsolver-ai/openai-agent-capsolver.git
+cd openai-agent-capsolver
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
 
-See [examples](examples/) for full flows. Use only pages and accounts you own or are explicitly authorized to automate.
+Export [`.env.example`](.env.example) values, then run `python examples/quickstart.py`.
 
-## Architecture
+## Key integration code
 
-~~~mermaid
-flowchart LR
-    A["OpenAI Agents SDK application"] -->|"verification detected"| B["openai-agent-capsolver"]
-    B -->|"structured call"| C["capsolver-agent"]
-    C -->|"solve request"| D["CapSolver API"]
-    D -->|"token and traceable result"| C
-    C -->|"fill or return"| B
-    B -->|"resume task"| A
-~~~
+```python
+from agents import Agent, function_tool
+from capsolver_agent import create_executor
 
-This repository owns framework conversion, examples, compatibility tests, and release cadence. Canonical detection, solving, fill-back, retries, and errors remain in shared CapSolver packages.
+capsolver = create_executor()
 
-## Capabilities
+@function_tool
+async def get_capsolver_balance() -> str:
+    return str(await capsolver.execute("get_balance", {}))
 
-| Capability | Purpose | Browser |
-|---|---|---:|
-| solve_captcha | Solve from known type, URL, and site key | No |
-| detect_captchas | Detect supported challenges | Yes |
-| solve_on_page | Detect, solve, and fill | Yes |
-| get_balance | Read account balance | No |
-| get_supported_captchas | Inspect registered handlers | No |
+agent = Agent(name="CapSolver demo", tools=[get_capsolver_balance])
+```
 
-## Examples
+See [`examples/quickstart.py`](examples/quickstart.py) for the complete runner flow and a solve tool.
 
-Released adapters should contain minimal registration, token mode, browser recovery where applicable, structured error handling, mocked tests, and an opt-in authorized live test.
+## Project layout
 
-## Configuration
-
-| Variable | Required | Description |
-|---|---:|---|
-| CAPSOLVER_API_KEY | Yes | CapSolver API key |
-| OPENAI_API_KEY | Example-dependent | Only for examples using OpenAI models |
-
-Never log keys, cookies, proxy passwords, solved tokens, personal information, or private URLs.
-
-## Error handling
-
-Retry only transient network, timeout, and rate-limit failures with bounded backoff. Do not retry invalid parameters indefinitely. Retain request identifiers for diagnosis and redact sensitive fields from exported logs. See [troubleshooting](docs/troubleshooting.md).
-
-## Compatibility and releases
-
-- Semantic Versioning after the first stable release.
-- CI tests supported runtime versions.
-- Dependabot tracks framework and Actions updates.
-- Tags publish through trusted publishing where available.
-- Pre-1.0 upstream breaking changes may require minor releases.
-
-## Responsible use
-
-You must obtain authorization, follow applicable law and target-site terms, apply reasonable rate limits, and protect account data. Do not use this project for unauthorized access, abusive automation, or evasion of protections around private accounts or data.
+```text
+examples/quickstart.py   OpenAI agent, runner, and function tools
+requirements.txt         Shared SDK repositories plus openai-agents
+tests/test_demo.py        Offline validation
+.github/workflows/ci.yml  Demo checks
+```
 
 ## Documentation
 
-- [CapSolver for AI Agents](https://docs.capsolver.com/en/guide/ai/capsolver-for-ai-agents/)
-- [Quick Start](https://docs.capsolver.com/en/guide/ai/introduction-and-quick-start/)
-- [Core SDK](https://docs.capsolver.com/en/guide/ai/core-sdk/)
-- [Agent Tools](https://docs.capsolver.com/en/guide/ai/agent-tools/)
-- [MCP Service](https://docs.capsolver.com/en/guide/ai/mcp-service/)
-- [Architecture](docs/architecture.md)
-- [Security](SECURITY.md)
-- [Support](SUPPORT.md)
+- [CapSolver Agent tools](https://docs.capsolver.com/en/guide/ai/agent-tools/)
+- [CapSolver for AI agents](https://docs.capsolver.com/en/guide/ai/capsolver-for-ai-agents/)
+- [OpenAI Agents SDK tools](https://openai.github.io/openai-agents-python/tools/)
+- [Running OpenAI agents](https://openai.github.io/openai-agents-python/running_agents/)
 
-## Contributing
+## Responsible use
 
-Read [CONTRIBUTING](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md). Issues and pull requests must use redacted fixtures and never contain credentials or private target data.
+Use the example only for lawful, user-authorized workflows that respect target-site terms. Never commit API keys or private target data.
 
-## License
+## Contributing, support, and license
 
-[ISC](LICENSE)
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SUPPORT.md](SUPPORT.md), and [SECURITY.md](SECURITY.md). Licensed under the [ISC License](LICENSE).
+
+OpenAI and the OpenAI Agents SDK are third-party to this repository. This project is maintained by CapSolver and is not affiliated with or endorsed by OpenAI.

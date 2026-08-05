@@ -1,5 +1,5 @@
 # Examples
 
-Examples must be runnable and safe to share. Copy .env.example to .env, provide your own keys, and use only pages and accounts you are authorized to automate.
+`quickstart.py` uses the OpenAI Agents SDK `@function_tool` decorator. Each function delegates directly to the shared CapSolver Agent executor.
 
-Released adapters should provide minimal setup, token mode, browser recovery where applicable, and structured error handling.
+There is no separate `openai-agent-capsolver` distribution.
